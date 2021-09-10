@@ -14,20 +14,31 @@ namespace SamuraiApp.UI
         {
             _context.Database.EnsureCreated();
             ListSamurais("Before add");
-            AddSamurai();
+            AddSamurai("Marko");
             ListSamurais("After add");
         }
 
-        private static void AddSamurai()
+        private static void AddSamurais(params string[] samuraiNames)
         {
-            Samurai samurai = new Samurai { Name = "Sampson" };
+            foreach (string samuraiName in samuraiNames)
+            {
+                AddSamurai(samuraiName, false);
+            }
+        }
+
+        private static void AddSamurai(string samuraiName, bool saveChanges = true)
+        {
+            Samurai samurai = new Samurai { Name = samuraiName };
             _context.Samurais.Add(samurai);
-            _context.SaveChanges();
+            if (saveChanges)
+            {
+                _context.SaveChanges();
+            }
         }
 
         private static void ListSamurais(string text)
         {
-            System.Collections.Generic.List<Samurai> samurais = _context.Samurais.ToList();
+            List<Samurai> samurais = _context.Samurais.ToList();
             Console.WriteLine($"{text}: Samurai count is {samurais.Count}");
 
             foreach (Samurai samurai in samurais)
