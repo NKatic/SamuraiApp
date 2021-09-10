@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SamuraiApp.Domain;
 
 namespace SamuraiApp.Data
@@ -12,7 +14,18 @@ namespace SamuraiApp.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             string someConnectionString = "Data Source=.; Initial Catalog = SamuraiAppData; Trusted_Connection=true; Integrated Security=true";
-            optionsBuilder.UseSqlServer(someConnectionString);
+            optionsBuilder.UseSqlServer(someConnectionString)
+                          .LogTo(Console.WriteLine, LogLevel.Information);
+                          //.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name });
+                          //.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
+                          //.EnableSensitiveDataLogging();
+
+            // if you want to log to a file:
+            //StreamWriter _writer = new StreamWriter("EFCoreLog.txt", append: true);
+            //optionsBuilder.LogTo(_writer.WriteLine);
+
+            // if you want to log to a debug window:
+            //optionsBuilder.LogTo(log => Debug.WriteLog(log));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
