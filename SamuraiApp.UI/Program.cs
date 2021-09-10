@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using SamuraiApp.Data;
 using SamuraiApp.Domain;
 
@@ -18,14 +19,6 @@ namespace SamuraiApp.UI
             ListSamurais("After add");
         }
 
-        private static void AddSamurais(params string[] samuraiNames)
-        {
-            foreach (string samuraiName in samuraiNames)
-            {
-                AddSamurai(samuraiName, false);
-            }
-        }
-
         private static void AddSamurai(string samuraiName, bool saveChanges = true)
         {
             Samurai samurai = new Samurai { Name = samuraiName };
@@ -33,6 +26,14 @@ namespace SamuraiApp.UI
             if (saveChanges)
             {
                 _context.SaveChanges();
+            }
+        }
+
+        private static void AddSamurais(params string[] samuraiNames)
+        {
+            foreach (string samuraiName in samuraiNames)
+            {
+                AddSamurai(samuraiName, false);
             }
         }
 
@@ -45,6 +46,12 @@ namespace SamuraiApp.UI
             {
                 Console.WriteLine(samurai.Name);
             }
+        }
+
+        private static void QueryFilters()
+        {
+            var samurais = _context.Samurais.Where(s => s.Name == "Sampson").ToList();
+            var s = _context.Samurais.Where(s => EF.Functions.Like(s.Name, "%pson"));
         }
     }
 }
