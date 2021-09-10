@@ -14,7 +14,7 @@ namespace SamuraiApp.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             string someConnectionString = "Data Source=.; Initial Catalog = SamuraiAppData; Trusted_Connection=true; Integrated Security=true";
-            optionsBuilder.UseSqlServer(someConnectionString)
+            optionsBuilder.UseSqlServer(someConnectionString, options => options.MaxBatchSize(100))
                           .LogTo(Console.WriteLine, LogLevel.Information);
                           //.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name });
                           //.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
@@ -32,7 +32,7 @@ namespace SamuraiApp.Data
         {
             // Entity Samurai...
             modelBuilder.Entity<Samurai>()
-                // ...has many Battles...
+                  // ...has many Battles...
                  .HasMany(s => s.Battles)
                  // ... with many samurais.
                  .WithMany(b => b.Samurais)
