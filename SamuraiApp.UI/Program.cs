@@ -50,8 +50,38 @@ namespace SamuraiApp.UI
 
         private static void QueryFilters()
         {
-            var samurais = _context.Samurais.Where(s => s.Name == "Sampson").ToList();
-            var s = _context.Samurais.Where(s => EF.Functions.Like(s.Name, "%pson"));
+            List<Samurai> samurais = _context.Samurais.Where(s => s.Name == "Sampson").ToList();
+            IQueryable<Samurai> s = _context.Samurais.Where(s => EF.Functions.Like(s.Name, "%pson"));
         }
+
+        private static void QueryAggregates()
+        {
+            string name = "Sampson";
+            Samurai samurai = _context.Samurais.FirstOrDefault(s => s.Name == name);
+            Samurai samuraiByKey = _context.Samurais.Find(2);
+        }
+
+        private static void RetrieveAndUpdateSamurai()
+        {
+            Samurai samurai = _context.Samurais.First();
+            samurai.Name += "San";
+            _context.SaveChanges();
+        }
+
+        private static void RetrieveAndUpdateMultipleSamurais()
+        {
+            List<Samurai> samurais = _context.Samurais.Skip(1).Take(4).ToList();
+            samurais.ForEach(s => s.Name += "San");
+            _context.SaveChanges();
+        }
+
+        private static void RetrieveAndDeleteSamurai()
+        {
+            Samurai samurai = _context.Samurais.Find(2);
+            _context.Samurais.Remove(samurai);
+            _context.SaveChanges();
+        }
+
+
     }
 }
