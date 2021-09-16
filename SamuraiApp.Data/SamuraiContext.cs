@@ -15,10 +15,10 @@ namespace SamuraiApp.Data
         {
             string someConnectionString = "Data Source=.; Initial Catalog = SamuraiAppData; Trusted_Connection=true; Integrated Security=true";
             optionsBuilder.UseSqlServer(someConnectionString, options => options.MaxBatchSize(100))
-                          .LogTo(Console.WriteLine, LogLevel.Information);
+                          .LogTo(Console.WriteLine, LogLevel.Information)
                           //.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name });
                           //.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
-                          //.EnableSensitiveDataLogging();
+                          .EnableSensitiveDataLogging();
 
             // if you want to log to a file:
             //StreamWriter _writer = new StreamWriter("EFCoreLog.txt", append: true);
