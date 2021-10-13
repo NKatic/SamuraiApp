@@ -204,5 +204,50 @@ namespace SamuraiApp.UI
                                                              .Include(s => s.Quotes.Where(q => q.Text.Contains("Thanks")))
                                                              .ToList();
         }
+
+        private struct IdAndName
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public IdAndName(int id, string name)
+            {
+                Id = id;
+                Name = name;
+            }
+        }
+
+        private static void ProjectSomeProperties()
+        {
+            var someProperties = _context.Samurais.Select(s => new { s.Id, s.Name }).ToList();
+            var idAndNames = _context.Samurais.Select(s => new IdAndName(s.Id, s.Name)).ToList();
+        }
+
+        private static void ProjectSamuraisWithQuotes()
+        {
+            var somePropsWithQuotes = _context.Samurais.Select(s => new { s.Id, s.Name, s.Quotes })
+                                                       .ToList();
+        }
+
+        private static void ProjectSamuraisWithQuotesFiltered()
+        {
+            var somePropsWithQuotes = _context.Samurais.Select(s => new { s.Id, s.Name, HappyQuotes = s.Quotes.Where(q => q.Text.Contains("happy")) })
+                                                       .ToList();
+        }
+
+        // Projecting full entity objects while filtering the related objects that are also returned - 
+        private static void ProjectSamuraisWithQuotesReturnSamuraiWithFilledNavigationProperty()
+        {
+            var somePropsWithQuotes = _context.Samurais.Select(s => new { s, s.Quotes }).ToList();
+            // somePropsWithQuotes[0].s.Quotes is filled because EFCore tracks objects and knows how to connect corresponding properties
+        }
+
+        // ALL entities recognized by the model will be tracked - EFCore marks the changed object by setting it to Modified status
+        private static void ProjectSamuraisWithQuotesEditSamuraiAfterQuery()
+        {
+            var samuraisAndQuotes = _context.Samurais.Select(s => new { Samurai = s, Happyquotes = s.Quotes.Where(q => q.Text.Contains("happy")) })
+                                                     .ToList();
+            var firstSamurai = samuraisAndQuotes[0].Samurai.Name += " The Happiest";
+        }
+
     }
 }
