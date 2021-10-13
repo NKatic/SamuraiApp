@@ -161,7 +161,8 @@ namespace SamuraiApp.UI
         }
 
         // Inserting related data
-        // **This one is bad because EFCore will run an update command on Samurai, even though we didn't change anything...
+        // **This one is bad because EFCore will run an update command on Samurai, even though we didn't
+        // change anything...
         private static void AddQuoteToExistingSamuraiNotTracked(int samuraiId)
         {
             var samurai = _context.Samurais.Find(samuraiId);
@@ -171,8 +172,10 @@ namespace SamuraiApp.UI
             });
             using (SamuraiContext context = new SamuraiContext())
             {
-                // **The solution is to use the Attach method (Samurais.Attach(samurai)), that will connect the object but set its state to unmodified.
-                // EFCore will see the missing key and missing foreign key in quote and insert that, but it will leave the Samurai alone
+                // **The solution is to use the Attach method (Samurais.Attach(samurai)), that will
+                // connect the object but set its state to unmodified. EFCore will see the missing
+                // key and missing foreign key in quote and insert that, but it will leave the
+                // Samurai alone
                 context.Samurais.Update(samurai);
                 context.SaveChanges();
             }
@@ -185,6 +188,21 @@ namespace SamuraiApp.UI
             using SamuraiContext newContext = new SamuraiContext();
             newContext.Quotes.Add(quote);
             newContext.SaveChanges();
+        }
+
+        // Eager Loading Related Data Samurais LEFT JOIN Quotes
+        private static void EagerLoadSamuraiWithQuotes()
+        {
+            List<Samurai> samuraiWithQuotes = _context.Samurais.Include(s => s.Quotes).ToList();
+            // Default is LEFT JOIN, AsSplitQuery will get samurais first then INNER JOIN them with the quotes
+            //List<Samurai> samuraiWithQuotes = _context.Samurais.AsSplitQuery().Include(s => s.Quotes).ToList();
+        }
+
+        private static void EagerLoadSamuraiWithQuotesIncludeFilter()
+        {
+            List<Samurai> filteredInclude = _context.Samurais.Where(s => s.Name.Contains("Sampson"))
+                                                             .Include(s => s.Quotes.Where(q => q.Text.Contains("Thanks")))
+                                                             .ToList();
         }
     }
 }
