@@ -273,5 +273,50 @@ namespace SamuraiApp.UI
                                       .Where(s => s.Text.Contains("happy"))
                                       .ToList();
         }
+
+        // Using related data to filter objects
+
+        // Get only samurais but filter over quote
+        private static void FilteringWithRelatedData()
+        {
+            var saumrais = _context.Samurais.Where(s => s.Quotes.Any(q => q.Text.Contains("happy")))
+                                            .ToList();
+        }
+
+        // Modifying related data
+
+        private static void ModifyingRelatedDataWhenTracked()
+        {
+            var samurai = _context.Samurais.Include(s => s.Quotes).FirstOrDefault(s => s.Id == 2);
+            samurai.Quotes[0].Text = "Did you hear that?";
+            _context.SaveChanges();
+        }
+
+        // In this example EFCore will create a query to update all quotes, even though we're only updating one!
+        // This is because the samurai object has all 4 quotes attached
+        private static void ModifyingRelatedDataWhenNotTrackedWrong()
+        {
+            var samurai = _context.Samurais.Include(s => s.Quotes).FirstOrDefault(s => s.Id == 2);
+            var quote = samurai.Quotes[0];
+            quote.Text += "Did you hear that again?";
+
+            using var newContext = new SamuraiContext();
+            newContext.Quotes.Update(quote);
+            newContext.SaveChanges();
+        }
+
+        // Use Entry method that focues specifically on the object you pass in the method and will ignore anything else that may be attached to it
+        private static void ModifyingRelatedDataWhenNotTracked()
+        {
+            var samurai = _context.Samurais.Include(s => s.Quotes)
+                                           .FirstOrDefault(s => s.Id == 2);
+            var quote = samurai.Quotes[0];
+            quote.Text += " Did you hear that again?";
+
+            using var newContext = new SamuraiContext();
+            newContext.Entry(quote).State = EntityState.Modified;
+            newContext.SaveChanges();
+        }
+
     }
 }
