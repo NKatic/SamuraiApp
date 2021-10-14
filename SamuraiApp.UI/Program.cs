@@ -249,5 +249,29 @@ namespace SamuraiApp.UI
             var firstSamurai = samuraisAndQuotes[0].Samurai.Name += " The Happiest";
         }
 
+        // Loading related data for objects already in memory
+        private static void AddNewHorse()
+        {
+            _context.Set<Horse>().Add(new Horse { SamuraiId = 1, Name = "Mr. Ed" });
+            _context.SaveChanges();
+        }
+
+        // You can only load from a single object!
+        private static void ExplicitLoad()
+        {
+            var samurai = _context.Samurais.Find(1);
+            _context.Entry(samurai).Collection(s => s.Quotes).Load();
+            _context.Entry(samurai).Reference(s => s.Horse).Load();
+        }
+
+        private static void FilterLoadedDataUsingQueryMethod()
+        {
+            var samurai = _context.Samurais.Find(1);
+            var happyQuotes = _context.Entry(samurai)
+                                      .Collection(e => e.Quotes)
+                                      .Query()
+                                      .Where(s => s.Text.Contains("happy"))
+                                      .ToList();
+        }
     }
 }
