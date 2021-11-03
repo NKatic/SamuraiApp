@@ -16,7 +16,7 @@ namespace SamuraiApp.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.9")
+                .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("SamuraiApp.Domain.Battle", b =>
@@ -78,7 +78,7 @@ namespace SamuraiApp.Data.Migrations
                     b.HasIndex("SamuraiId")
                         .IsUnique();
 
-                    b.ToTable("Horse");
+                    b.ToTable("Horses");
                 });
 
             modelBuilder.Entity("SamuraiApp.Domain.Quote", b =>

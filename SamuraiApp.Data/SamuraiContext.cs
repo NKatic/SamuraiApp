@@ -54,6 +54,10 @@ namespace SamuraiApp.Data
 
             // Ako želimo imati naziv klase drugačiji od naziva tablice u bazi, moramo definirati koja klasa se mapira u koju tablicu
             // modelBuilder.Entity<XYZBattleSamurai>().ToTable("BattleSamurai");
+
+            // Trenutno se tablica za konje u bazi zove Horse, zato jer nemamo dbSet u kontekstu za klasu Horse i zato EfCore koristi konvenciju i kreira tablicu koja se zove jednako kao i klasa. To nam ne odgovara
+            // jer želimo da se tablice zovu u množini pa koristimo ToTable metodu
+            modelBuilder.Entity<Horse>().ToTable("Horses");
         }
     }
 }

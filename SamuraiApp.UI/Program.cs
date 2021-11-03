@@ -352,5 +352,74 @@ namespace SamuraiApp.UI
                 _context.SaveChanges();
             }
         }
+
+        /// Persisting data in One-to-One relationships
+        // Db behavior is the same as when adding a samurai with a quote (one-to-many): EfCore sends an insert statement to insert a samurai 
+        // with a query to return the database generated id. EfCore then takes that id, integrates it into an insert statement to insert a new horse.
+        private static void AddNewSamuraiWithHorse()
+        {
+            var samurai = new Samurai { Name = "Jina Ujichika" };
+            samurai.Horse = new Horse { Name = "Silver" };
+            _context.Samurais.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        // Add a new horse to a samurai that exists but doesn't already have a horse, using samurai id (without samurai object)
+        private static void AddNewHorseToSamuraiUsingId()
+        {
+            var horse = new Horse { Name = "Scout", SamuraiId = 2 };
+            _context.Add(horse);
+            _context.SaveChanges();
+        }
+
+        // Add a new horse to a samurai that exists but doesn't already have a horse, using a samurai object.
+        private static void AddNewHorseToSamuraiObject()
+        {
+            var samurai = _context.Samurais.Find(12);
+            samurai.Horse = new Horse { Name = "Black Beauty" };
+            _context.SaveChanges();
+        }
+
+        // Add a new horse to samurai detached
+        private static void AddNewHorseToDisconnectedSamuraiObject()
+        {
+            var samurai = _context.Samurais.AsNoTracking().FirstOrDefault(s => s.Id == 5);
+            samurai.Horse = new Horse { Name = "Mr. Ed" };
+
+            using var newContext = new SamuraiContext();
+            newContext.Samurais.Attach(samurai);
+            newContext.SaveChanges();
+        }
+
+        /// Changing the child of an existing parent
+        // EfCore will delete the old horse from the database before inserting a new horse
+        private static void ReplaceAHorse()
+        {
+            var samurai = _context.Samurais.Include(e => e.Horse).FirstOrDefault(s => s.Id == 5);
+            samurai.Horse = new Horse { Name = "Trigger" };
+            _context.SaveChanges();
+        }
+
+        /// Querying a one-to-one relationship
+        // Gets a samurai with his horse. Straightforward
+        private static void GetSamuraiWithHorse()
+        {
+            var samurais = _context.Samurais.Include(s => s.Horse).ToList();
+        }
+
+        // Gets a horse with a samurai. We don't have a dbSet for horses in the context! One solution is to use _context.Set<> and then some creative linq to get a samurai.
+        // But a better solution is to start with a samurai and drill down to the horse property
+        private static void GetHorsesWithSamurai()
+        {
+            Horse horseOnly = _context.Set<Horse>().Find(3);
+
+            Samurai horseWithSamurai = _context.Samurais.Include(s => s.Horse)
+                                                    .FirstOrDefault(s => s.Horse.Id == 3);
+
+            // We can also select a horse-samurai pair
+            var horseSamuraiPairs = _context.Samurais.Where(s => s.Horse != null)
+                                                     .Select(s => new { Horse = s.Horse, Samurai = s })
+                                                     .ToList();
+        }
     }
 }
