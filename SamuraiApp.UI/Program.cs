@@ -305,7 +305,7 @@ namespace SamuraiApp.UI
             newContext.SaveChanges();
         }
 
-        // Use Entry method that focues specifically on the object you pass in the method and will ignore anything else that may be attached to it
+        // Use Entry method that focues specifically on the object you pass in the method and it will ignore anything else that may be attached to it
         private static void ModifyingRelatedDataWhenNotTracked()
         {
             var samurai = _context.Samurais.Include(s => s.Quotes)
@@ -318,5 +318,39 @@ namespace SamuraiApp.UI
             newContext.SaveChanges();
         }
 
+        // Removes an entity from a many to many relationship (takes a samurai out of a battle)
+        private static void RemoveSamuraiFromABattle()
+        {
+            // Get a battle with attached samurai we want to remove. It's important to have the navigation graph filled.
+            Battle battleWithSamurai = _context.Battles.Include(e => e.Samurais.Where(s => s.Id == 12))
+                                                    .Single(e => e.BattleId == 1);
+            Samurai samurai = battleWithSamurai.Samurais[0];
+
+            // Remove the samurai from the battle's navigation property
+            battleWithSamurai.Samurais.Remove(samurai);
+            _context.SaveChanges();
+
+            // There's no mention of any join tables or simmilar, it's enough just to remove one entity from the navigation property of the other one.
+        }
+        // Example of a failed attempt at removing an entity from a many to many relationship.
+        // We never create a link via the navigation properties so the context is not aware of the relationship between the samurai and the battle.
+        private static void FailedRemoveSamuraiFromABattle()
+        {
+            Battle battle = _context.Battles.First();
+            Samurai samurai = _context.Samurais.Find(12);
+            battle.Samurais.Remove(samurai);
+            _context.SaveChanges(); // the relationship is not being tracked
+        }
+
+        private static void RemoveSamuraiFromABattleExplicit()
+        {
+            var b_s = _context.Set<BattleSamurai>()
+                              .SingleOrDefault(bs => bs.BattleId == 1 && bs.SamuraiId == 10);
+            if(b_s != null)
+            {
+                _context.Remove(b_s);
+                _context.SaveChanges();
+            }
+        }
     }
 }

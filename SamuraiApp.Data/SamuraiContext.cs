@@ -37,7 +37,7 @@ namespace SamuraiApp.Data
                  // ... with many samurais.
                  .WithMany(b => b.Samurais)
                  // Sada EFCore zna da pričamo o vezi Samurai-Battle. Dalje mu treba reći koju tablicu da koristi za tu many-to-many vezu, inače će sam pretpostaviti join tablicu.
-                 // Osim definiranja same tablice, potrebno je definirati vezu između BattleSamurai tablice i dvije tablice koje ona povezuje. To radimo s HasOne/WithMany, zato jer su
+                 // Osim definiranja same tablice, potrebno je definirati vezu između BattleSamurai join tablice i dvije tablice koje ona povezuje. To radimo s HasOne/WithMany, zato jer su
                  // veze Battle-BattleSamurai i Samurai-BattleSamurai one-to-many.
                  .UsingEntity<BattleSamurai>(
                 bs => bs.HasOne<Battle>().WithMany(),
@@ -51,6 +51,9 @@ namespace SamuraiApp.Data
             //    .Property(bs => bs.SamuraiId).HasColumnName("SamuraisId");
             //modelBuilder.Entity<BattleSamurai>()
             //    .Property(bs => bs.BattleId).HasColumnName("BattlesBattleId");
+
+            // Ako želimo imati naziv klase drugačiji od naziva tablice u bazi, moramo definirati koja klasa se mapira u koju tablicu
+            // modelBuilder.Entity<XYZBattleSamurai>().ToTable("BattleSamurai");
         }
     }
 }
