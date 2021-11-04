@@ -116,6 +116,20 @@ namespace SamuraiApp.Data.Migrations
                     b.ToTable("Samurais");
                 });
 
+            modelBuilder.Entity("SamuraiApp.Domain.SamuraiBattleStat", b =>
+                {
+                    b.Property<string>("EarliestBattle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("NumberOfBattles")
+                        .HasColumnType("int");
+
+                    b.ToView("SamuraiBattleStats");
+                });
+
             modelBuilder.Entity("SamuraiApp.Domain.BattleSamurai", b =>
                 {
                     b.HasOne("SamuraiApp.Domain.Battle", null)

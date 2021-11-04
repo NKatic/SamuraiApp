@@ -10,6 +10,7 @@ namespace SamuraiApp.Data
         public DbSet<Samurai> Samurais { get; set; }
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<Battle> Battles { get; set;  }
+        public DbSet<SamuraiBattleStat> SamuraiBattleStats { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -58,6 +59,12 @@ namespace SamuraiApp.Data
             // Trenutno se tablica za konje u bazi zove Horse, zato jer nemamo dbSet u kontekstu za klasu Horse i zato EfCore koristi konvenciju i kreira tablicu koja se zove jednako kao i klasa. To nam ne odgovara
             // jer želimo da se tablice zovu u množini pa koristimo ToTable metodu
             modelBuilder.Entity<Horse>().ToTable("Horses");
+
+            // If we want to use a keyless entity to map to a view, we need to explicitly tell EFCore that the class is keyless.
+            // !! EFCore will NEVER track entities marked with HasNoKey() !!
+            modelBuilder.Entity<SamuraiBattleStat>().HasNoKey();
+            // Also, we need to tell EFCore that the DbSet maps to a view, otherwise it will try to create a new table.
+            modelBuilder.Entity<SamuraiBattleStat>().ToView("SamuraiBattleStats");
         }
     }
 }

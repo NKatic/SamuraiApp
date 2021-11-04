@@ -14,10 +14,7 @@ namespace SamuraiApp.UI
         private static void Main(string[] args)
         {
             _context.Database.EnsureCreated();
-            //InsertNewSamuraiWithAQuote();
-            //InsertNewSamuraiWithManyQuotes();
-            //AddQuoteToExistingSamuraiWhileTracked();
-            //AddQuoteToExistingSamuraiNotTracked(2);
+            QuerySamuraiBattleStatsSimple();
         }
 
         private static void AddSamurai(string samuraiName, bool saveChanges = true)
@@ -424,5 +421,64 @@ namespace SamuraiApp.UI
 
         /// Module 7: Working with Views and Stored Procedures and Raw SQL
         
+        // querying the database views
+        private static void QuerySamuraiBattleStatsSimple()
+        {
+            var stats = _context.SamuraiBattleStats.ToList();
+        }
+
+        // querying the database view
+        private static void QuerySamuraiBattleStats()
+        {
+            var stats = _context.SamuraiBattleStats.FirstOrDefault();
+            var sampsonState = _context.SamuraiBattleStats.FirstOrDefault(b => b.Name == "Sampson");
+        }
+
+        /// querying with Raw SQL
+        /// _context.Samurais.FromSQLRaw("some sql string").ToList();
+        /// _context.Samurais.FromSQLRawAsync("some sql string").ToList();
+        /// _context.Samurais.FromSQLInterpolated("some sql string {var}").ToList();
+        /// _context.Samurais.FromSQLInterpolatedAsync("some sql string {var}").ToList();
+        /// 
+        /// Raw SQL Results Rules (Limitations)
+        /// Must return data for all properties of the entity type
+        /// Column names in results match mapped column names
+        /// Query can't contain related data
+        /// Only query entities and keyless entities known by DbContext, can't query entities that we don't have DbSets of
+        
+        // !! Use parameters to avoid SQL injection !! !! Never pass interpolated strings into FromSqlRaw methods, use FromSqlInterpolated !! 
+        // EFCore will first interpolate the string and then execute the raw sql on the database, meaning we're open to SQL injection
+        private static void QueryUsingRawSql()
+        {
+            var samurais = _context.Samurais.FromSqlRaw("Select * from samurais").ToList();
+        }
+
+        // Include additional navigation properties in the result of the FromSqlRawMethod
+        private static void QueryRelatedUsingRawSql()
+        {
+            var samuraisWithQuotes = _context.Samurais.FromSqlRaw("Select Id, Name from samurais").Include(s => s.Quotes).ToList();
+        }
+
+        // Running Stored Procedure Queries with Raw SQL
+        private static void QueryUsingFromSqlRawStoredProc()
+        {
+            var text = "Happy";
+            var samurais = _context.Samurais.FromSqlRaw(
+                "EXEC dbo.SamuraisWhoSaidAWord {0}", text).ToList();
+        }
+
+        // _context.Database.ExecuteSQLRaw("some sql string");
+        // _context.Database.ExecuteSQLRawAsync("some sql string");
+        // _context.Database.ExecuteSQLInterpolated("some sql string");
+        // _context.Database.ExecuteSQLInterpolatedAsync("some sql string");
+        //Executing Non-Query raw SQL commands (can't be used for queries, only result you will get back is the number of rows affected)
+        private static void ExecuteSomeRawSql()
+        {
+            // Database accesses the db configured for the DbContext instance
+            var samuraiId = 2;
+            var affected = _context.Database.ExecuteSqlRaw("EXEC DeleteQuotesForSamurai {0}", samuraiId);
+            // or
+            var affected2 = _context.Database.ExecuteSqlInterpolated($"EXEC DeleteQuotesForSamurai {samuraiId}");
+        }
     }
 }
