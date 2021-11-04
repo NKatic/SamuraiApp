@@ -421,5 +421,8 @@ namespace SamuraiApp.UI
                                                      .Select(s => new { Horse = s.Horse, Samurai = s })
                                                      .ToList();
         }
+
+        /// Module 7: Working with Views and Stored Procedures and Raw SQL
+        
     }
 }
