@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SamuraiApp.Domain;
@@ -7,9 +9,17 @@ namespace SamuraiApp.Data
 {
     public class SamuraiContext : DbContext
     {
+        public SamuraiContext() : base()
+        {
+
+        }
         public SamuraiContext(DbContextOptions<SamuraiContext> options) : base(options)
         {
 
+        }
+
+        public SamuraiContext(DbContextOptions options) : base(options)
+        {
         }
 
         public DbSet<Samurai> Samurais { get; set; }
@@ -19,22 +29,26 @@ namespace SamuraiApp.Data
 
         // !! Enable for Console app, disable for ASP.NET app !!
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    string someConnectionString = "Data Source=.; Initial Catalog = SamuraiAppData; Trusted_Connection=true; Integrated Security=true";
-        //    optionsBuilder.UseSqlServer(someConnectionString, options => options.MaxBatchSize(100))
-        //                  .LogTo(Console.WriteLine, LogLevel.Information)
-        //                  //.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name });
-        //                  //.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
-        //                  .EnableSensitiveDataLogging();
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                string someConnectionString = "Data Source=.; Initial Catalog = SamuraiTestData; Trusted_Connection=true; Integrated Security=true";
+                optionsBuilder.UseSqlServer(someConnectionString, options => options.MaxBatchSize(100));
+                // Logging commented out for last module, testing
+                //.LogTo(Console.WriteLine, LogLevel.Information)
+                ////.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name });
+                ////.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
+                //.EnableSensitiveDataLogging();
 
-        //    // if you want to log to a file:
-        //    //StreamWriter _writer = new StreamWriter("EFCoreLog.txt", append: true);
-        //    //optionsBuilder.LogTo(_writer.WriteLine);
+                // if you want to log to a file:
+                //StreamWriter _writer = new StreamWriter("EFCoreLog.txt", append: true);
+                //optionsBuilder.LogTo(_writer.WriteLine);
 
-        //    // if you want to log to a debug window:
-        //    //optionsBuilder.LogTo(log => Debug.WriteLog(log));
-        //}
+                // if you want to log to a debug window:
+                //optionsBuilder.LogTo(log => Debug.WriteLog(log)); 
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
